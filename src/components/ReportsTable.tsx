@@ -12,6 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { CustomToastFail, CustomToastSuccess } from "./CustomToastSuccess";
 
 interface Report {
   id: string;
@@ -65,10 +66,12 @@ const mockReports: Report[] = [
 export const ReportsTable = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const allReports = localStorage.getItem('allReports')
+  const allReports = localStorage.getItem("allReports");
   const [reports, setReports] = useState<Report[]>(mockReports);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
-console.log("reports" , reports);
+  console.log("reports", reports);
 
   useEffect(() => {
     // Load reports from localStorage
@@ -77,15 +80,15 @@ console.log("reports" , reports);
       try {
         const allReports = JSON.parse(allReportsJson);
 
-        console.log('allReports table' , allReports);
-        
+        console.log("allReports table", allReports);
+
         const mappedReports: Report[] = allReports.map((report) => ({
           id: report.id,
           reportNumber: report.step1.projectCode,
           title: report.step1.projectName,
           engineer: report.step1.owner,
           station: report.step1.substationName || "-",
-          date: report.step1.inspectionDate ,
+          date: report.step1.inspectionDate,
           status: report.step1.status || "status",
         }));
         // Combine with mock reports
@@ -116,14 +119,20 @@ console.log("reports" , reports);
 
     return (
       <Badge
-        // variant={variants[status].variant}
-        // className={variants[status].className}
+      // variant={variants[status].variant}
+      // className={variants[status].className}
       >
         {t(`${status}`)}
       </Badge>
     );
   };
 
+  const handleCancelBtn = () => {
+    setShowErrorToast(true);
+  };
+  const handleAcceptBtn = () => {
+    setShowSuccessToast(true);
+  };
   return (
     <div className="border rounded-lg">
       <Table>
@@ -169,6 +178,7 @@ console.log("reports" , reports);
                         size="icon"
                         className="text-success"
                         title={t("common.approve")}
+                        onClick={handleAcceptBtn}
                       >
                         <Check className="h-4 w-4" />
                       </Button>
@@ -177,6 +187,7 @@ console.log("reports" , reports);
                         size="icon"
                         className="text-destructive"
                         title={t("common.decline")}
+                        onClick={handleCancelBtn}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -188,6 +199,14 @@ console.log("reports" , reports);
           ))}
         </TableBody>
       </Table>
+      <CustomToastFail
+        isVisible={showErrorToast}
+        onClose={() => setShowErrorToast(false)}
+      />
+      <CustomToastSuccess
+        isVisible={showSuccessToast}
+        onClose={() => setShowSuccessToast(false)}
+      />
     </div>
   );
 };

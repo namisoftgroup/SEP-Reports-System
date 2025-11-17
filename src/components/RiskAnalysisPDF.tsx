@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export default function RiskAnalysisPDF() {
+export default function RiskAnalysisPDF({ report }) {
   const [activeTab, setActiveTab] = useState("overview");
 
   const riskData = [
@@ -168,7 +168,9 @@ export default function RiskAnalysisPDF() {
         </div>
 
         <div>
-          <h1 className="text-xl font-bold text-[#0d5c87] py-2">Risk Analysis</h1>
+          <h1 className="text-xl font-bold text-[#0d5c87] py-2">
+            Risk Analysis
+          </h1>
         </div>
 
         {/* Risk Priority List */}
@@ -205,7 +207,7 @@ export default function RiskAnalysisPDF() {
         </Card>
 
         {/* Risk Matrix */}
-        <Card  className="border-none border-b rounded-none">
+        <Card className="border-none border-b rounded-none">
           <CardHeader>
             <CardTitle className="text-lg px-4 ">Risk Matrix</CardTitle>
           </CardHeader>
@@ -243,7 +245,9 @@ export default function RiskAnalysisPDF() {
                       backgroundColor: "#fff",
                       border: "1px solid #ccc",
                     }}
-                    formatter={(value) => value.toFixed(0)}
+                    formatter={(value) =>
+                      typeof value === "number" ? value.toFixed(0) : value
+                    }
                   />
                   <Scatter name="Components" data={riskData} fill="#f97316" />
                 </ScatterChart>
@@ -270,11 +274,13 @@ export default function RiskAnalysisPDF() {
         {/* Additional Notes */}
         <Card className="border-none border-b rounded-none">
           <CardHeader>
-            <CardTitle className="text-lg text-[#1c6891]">Additional Notes</CardTitle>
+            <CardTitle className="text-lg text-[#1c6891]">
+              Additional Notes
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-700">
-              تم المحاضر بحضور فريق الصيانة المحلي
+              {report.step8.descriptionField}
             </p>
           </CardContent>
         </Card>

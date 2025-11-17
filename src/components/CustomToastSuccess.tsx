@@ -1,5 +1,6 @@
 import { Trash2 } from "lucide-react";
 import React, { useState } from "react";
+import { Button } from "./ui/button";
 
 // Success Toast Component
 export function CustomToastSuccess({ isVisible, onClose }) {
@@ -7,7 +8,7 @@ export function CustomToastSuccess({ isVisible, onClose }) {
     if (isVisible) {
       const timer = setTimeout(() => {
         onClose();
-      }, 3000);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [isVisible, onClose]);
@@ -134,15 +135,6 @@ export function CustomToastSuccess({ isVisible, onClose }) {
 
 // Success Toast Component
 export function CustomToastFail({ isVisible, onClose }) {
-  React.useEffect(() => {
-    if (isVisible) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible, onClose]);
-
   if (!isVisible) return null;
 
   return (
@@ -152,8 +144,8 @@ export function CustomToastFail({ isVisible, onClose }) {
           <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl">
             {/* Success Icon */}
             <div className="flex justify-center mb-6">
-                {/* Animated rays */}
-               <Trash2 className="text-red-500 text-center text-5xl" />
+              {/* Animated rays */}
+              <Trash2 className="text-red-500 text-center" size={100} />
             </div>
 
             {/* Text */}
@@ -161,6 +153,10 @@ export function CustomToastFail({ isVisible, onClose }) {
               Are You Sure!!
             </h2>
             <p>you want to delete this Report</p>
+            <div className="flex gap-2 py-2">
+              <Button onClick={()=> onClose()} className="flex-1" variant="outline">Cancel</Button>
+              <Button onClick={()=> onClose()} variant="destructive">sure</Button>
+            </div>
           </div>
         </div>
       )}

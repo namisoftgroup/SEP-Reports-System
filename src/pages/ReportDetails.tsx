@@ -7,12 +7,15 @@ import { useTranslation } from "react-i18next";
 import RiskAnalysisPDF from "@/components/RiskAnalysisPDF";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import ModalImage from "@/components/ModalImage";
 const ReportDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [report, setReport] = useState(null);
   const componentRef = useRef(null);
+  const [isOpenImageModal, setIsOpenImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   useEffect(() => {
     const allReportsJson = localStorage.getItem("allReports");
     // console.log("all report json", JSON.parse(allReportsJson));
@@ -39,7 +42,7 @@ const ReportDetails = () => {
   }
   const handleDownloadPDF = async () => {
     const element = componentRef.current;
-    const canvas = await html2canvas(element, { scale: 2});
+    const canvas = await html2canvas(element, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -48,10 +51,10 @@ const ReportDetails = () => {
     const imgHeight = (canvas.height * pdfWidth) / canvas.width;
     let heightLeft = imgHeight;
     let position = 0;
-    // الصفحة الأولى
+    // first page
     pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
     heightLeft -= pdfHeight;
-    // الصفحات التالية
+    // remain pages
     while (heightLeft > 0) {
       position -= pdfHeight;
       pdf.addPage();
@@ -60,6 +63,12 @@ const ReportDetails = () => {
     }
     pdf.save("report.pdf");
   };
+
+  // console.log(
+  //   "report details page data from localStorage to display ::",
+  //   report
+  // );
+
   return (
     <div className="max-w-7xl mx-auto space-y-6 bg-white">
       {/* Header */}
@@ -165,6 +174,7 @@ const ReportDetails = () => {
             </div>
           </div>
         </div>
+
         {/* Step 2: Primary GIS Equipment */}
         {report?.step2 && Object.keys(report?.step2).length > 0 && (
           <div className="bg-card border-b p-6">
@@ -175,7 +185,7 @@ const ReportDetails = () => {
               <h2 className="text-xl font-bold">Primary Equipment GIS</h2>
             </div>
             <div className="space-y-6">
-              {report?.step2.map((section: any, idx: number) => (
+              {report?.step2.map((section, idx: number) => (
                 <div key={idx} className="bg-blue-200/20 rounded-lg p-4">
                   <h3 className="font-bold text-lg mb-4 capitalize">
                     {section.sectionKey.replace(/_/g, " ")}
@@ -240,7 +250,8 @@ const ReportDetails = () => {
                     </div>
                   )} */}
                   {/* Files */}
-                  {/* {section.files && Object.keys(section.files).length > 0 && (
+
+                  {section.files && Object.keys(section.files).length > 0 && (
                     <div>
                       <h4 className="font-semibold mb-3">Uploaded Documents</h4>
                       <div className="space-y-3">
@@ -248,186 +259,331 @@ const ReportDetails = () => {
                           ([fileKey, filesList]: [string, any]) =>
                             filesList &&
                             filesList.length > 0 && (
-                              <div key={fileKey} className="bg-background rounded p-3">
+                              <div
+                                key={fileKey}
+                                className="bg-background rounded p-3"
+                              >
                                 <p className="text-sm font-medium mb-2 capitalize">
-                                  {fileKey.replace(/_/g, " ").split(" ").slice(1).join(" ")}
+                                  {fileKey
+                                    .replace(/_/g, " ")
+                                    .split(" ")
+                                    .slice(1)
+                                    .join(" ")}
                                 </p>
                                 <div className="space-y-2">
-                                  {filesList.map((file: any, fileIdx: number) => (
-                                    <div
-                                      key={fileIdx}
-                                      className="flex items-center gap-2 text-sm"
-                                    >
-                                      <FileText className="h-4 w-4" />
-                                      <span>{file.name}</span>
-                                      <span className="text-muted-foreground">
-                                        ({file.size})
-                                      </span>
-                                    </div>
-                                  ))}
+                                  {filesList.map(
+                                    (file: any, fileIdx: number) => (
+                                      <div
+                                        key={fileIdx}
+                                        className="flex items-center gap-2 text-sm"
+                                      >
+                                        {file.type.includes("image") ? (
+                                          <img
+                                            onClick={() => {
+                                              setSelectedImage('../../public/logo.png');
+                                              setIsOpenImageModal(true);
+                                            }}
+                                            src="/logo.png"
+                                            className="h-6 w-6"
+                                          />
+                                        ) : (
+                                          <FileText className="h-4 w-4" />
+                                        )}
+                                        <span>{file.name}</span>
+                                        <span className="text-muted-foreground">
+                                          ({file.size})
+                                        </span>
+                                      </div>
+                                    )
+                                  )}
                                 </div>
                               </div>
                             )
                         )}
                       </div>
                     </div>
-                  )} */}
+                  )}
                 </div>
               ))}
             </div>
           </div>
         )}
-        {/* Step 3: Primary Equipment AIS
-         */}
-        <div className="bg-card  border-b p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
-              3
+
+        {/* Step 3: Primary Equipment AIS*/}
+        {report?.step3 && Object.keys(report?.step3).length > 0 && (
+          <div className="bg-card border-b p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                3
+              </div>
+              <h2 className="text-xl font-bold">Primary Equipment AIS</h2>
             </div>
-            <h2 className="text-xl font-bold">Primary Equipment AIS</h2>
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="bg-slate-50 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                Current Transformers
-              </p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                Surge Arresters
-              </p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                Circuit Breakers
-              </p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">Isolators</p>
-              <p className="font-medium">-</p>
-            </div>
-          </div>
-        </div>
-        {/* Step 4: Primary Equipment AIS*/}
-        <div className="bg-card  border-b p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
-              4
-            </div>
-            <h2 className="text-xl font-bold">Secondary Equipment</h2>
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="border p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                Equipment Type
-              </p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="border p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">Manufacturer</p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">Description</p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                Operational Condition
-              </p>
-              <p className="font-medium">-</p>
+            <div className="space-y-6">
+              {report?.step3.map((section, idx: number) => (
+                <div key={idx} className=" p-4">
+                  <h3 className="font-bold text-lg mb-4 capitalize">
+                    {section.sectionKey.replace(/_/g, " ")}
+                  </h3>
+                  {/* Main Equipment Info - Only 4 fields */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-slate-50 p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Current Transformers
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.equipmentTag || "-"}
+                      </p>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Surge Arresters
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.manufacturer || "-"}
+                      </p>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Circuit Breakers
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.description || "-"}
+                      </p>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Isolators
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.condition || "-"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Step 4: Secondary Equipment*/}
+        {report?.step4 && Object.keys(report?.step4).length > 0 && (
+          <div className="bg-card border-b p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                4
+              </div>
+              <h2 className="text-xl font-bold">Secondary Equipment</h2>
+            </div>
+            <div className="space-y-6">
+              {report?.step4.map((section, idx: number) => (
+                <div key={idx} className=" p-4">
+                  <h3 className="font-bold text-lg mb-4 capitalize">
+                    {section.sectionKey.replace(/_/g, " ")}
+                  </h3>
+                  {/* Main Equipment Info - Only 4 fields */}
+                  <div className="grid grid-cols-1 gap-4 mb-6">
+                    <div className="border p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Current Transformers
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.equipmentTag || "-"}
+                      </p>
+                    </div>
+                    <div className="border p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Surge Arresters
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.manufacturer || "-"}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-slate-50 p-4 rounded-xl">
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Circuit Breakers
+                        </p>
+                        <p className="font-medium">
+                          {section.sectionData?.description || "-"}
+                        </p>
+                      </div>
+                      <div className="bg-slate-50 p-4 rounded-xl">
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Isolators
+                        </p>
+                        <p className="font-medium">
+                          {section.sectionData?.condition || "-"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Step 5: Outdoor Switchyard */}
-        <div className="bg-card  border-b p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
-              5
+        {report?.step5 && Object.keys(report?.step5).length > 0 && (
+          <div className="bg-card border-b p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                5
+              </div>
+              <h2 className="text-xl font-bold"> Outdoor Switchyard</h2>
             </div>
-            <h2 className="text-xl font-bold">Outdoor Switchyard</h2>
+            <div className="space-y-6">
+              {report?.step5.map((section, idx: number) => (
+                <div key={idx} className=" p-4">
+                  <h3 className="font-bold text-lg mb-4 capitalize">
+                    {section.sectionKey.replace(/_/g, " ")}
+                  </h3>
+                  {/* Main Equipment Info - Only 4 fields */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="border p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Busbar Systems
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.equipmentTag || "-"}
+                      </p>
+                    </div>
+                    <div className="border p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Foundations
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.manufacturer || "-"}
+                      </p>
+                    </div>
+                    <div className="border p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Lightning Protection Systems
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.description || "-"}
+                      </p>
+                    </div>
+                    <div className="border p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        General Condition
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.condition || "-"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="border p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                Busbar Systems
-              </p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="border p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">Foundations</p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="border p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                Lightning Protection Systems
-              </p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="border p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                General Condition
-              </p>
-              <p className="font-medium">-</p>
-            </div>
-          </div>
-        </div>
+        )}
+
         {/* Step 6: Power Transformers */}
-        <div className="bg-card  border-b p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
-              6
+        {report?.step6 && Object.keys(report?.step6).length > 0 && (
+          <div className="bg-card border-b p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                6
+              </div>
+              <h2 className="text-xl font-bold">Power Transformers</h2>
             </div>
-            <h2 className="text-xl font-bold">Power Transformers</h2>
+            <div className="space-y-6">
+              {report?.step6.map((section, idx: number) => (
+                <div key={idx} className=" p-4">
+                  <h3 className="font-bold text-lg mb-4 capitalize">
+                    {section.sectionKey.replace(/_/g, " ")}
+                  </h3>
+                  {/* Main Equipment Info - Only 4 fields */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-blue-200/20 p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Transformer Type
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.equipmentTag || "-"}
+                      </p>
+                    </div>
+                    <div className="bg-blue-200/20 p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Manufacturer
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.manufacturer || "-"}
+                      </p>
+                    </div>
+                    <div className="bg-blue-200/20 p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Capacity (MVA)
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.description || "-"}
+                      </p>
+                    </div>
+                    <div className="bg-blue-200/20 p-4 rounded-xl">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Condition
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.condition || "-"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="bg-blue-200/20 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                Transformer Type
-              </p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="bg-blue-200/20 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">Manufacturer</p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="bg-blue-200/20 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">
-                Capacity (MVA)
-              </p>
-              <p className="font-medium">-</p>
-            </div>
-            <div className="bg-blue-200/20 p-4 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">Condition</p>
-              <p className="font-medium">-</p>
-            </div>
-          </div>
-        </div>
+        )}
+
         {/* Step 7: Warranty and Limited Liability */}
-        <div className="bg-card  border-b p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
-              7
+        {report?.step7 && Object.keys(report?.step7).length > 0 && (
+          <div className="bg-card border-b p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                7
+              </div>
+              <h2 className="text-xl font-bold">
+                {" "}
+                Warranty and Limited Liability
+              </h2>
             </div>
-            <h2 className="text-xl font-bold">
-              Warranty and Limited Liability
-            </h2>
+            <div className="space-y-6">
+              {report?.step7.map((section, idx: number) => (
+                <div key={idx} className=" p-4">
+                  <h3 className="font-bold text-lg mb-4 capitalize">
+                    {section.sectionKey.replace(/_/g, " ")}
+                  </h3>
+                  {/* Main Equipment Info - Only 4 fields */}
+                  <div className="grid grid-cols-2 gap-6 p-3 border border-yellow-300 bg-yellow-50 rounded-xl">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        System Type
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.equipmentTag || "-"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Manufacturer
+                      </p>
+                      <p className="font-medium">
+                        {section.sectionData?.equipmentTag || "-"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-6 p-3 border border-yellow-300 bg-yellow-50 rounded-xl">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">System Type</p>
-              <p className="font-medium">-</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Manufacturer</p>
-              <p className="font-medium">-</p>
-            </div>
-          </div>
-        </div>
-        <RiskAnalysisPDF />
+        )}
+
+        <RiskAnalysisPDF report={report} />
+        <ModalImage
+          isOpenImageModal={isOpenImageModal}
+          setIsOpenImageModal={setIsOpenImageModal}
+          selectedImage={selectedImage}
+        />
       </div>
     </div>
   );
