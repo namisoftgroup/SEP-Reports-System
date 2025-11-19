@@ -12,7 +12,7 @@ const MyReports = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">{t('reports.myReports')}</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('reports.allReports')}</h1>
           <p className="text-muted-foreground">{t('dashboard.reportsAwaitingReview')}</p>
         </div>
         <Button onClick={() => navigate('/new-report')} className="gap-2">

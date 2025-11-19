@@ -56,12 +56,19 @@ const mockEngineers: Engineer[] = [
   },
 ];
 
-export const EngineerReportTable = () => {
+interface EngineerReportTableProps {
+  engineers: Engineer[];
+  setEngineers: (engineers: Engineer[]) => void;
+}
+
+export const EngineerReportTable = ({ engineers, setEngineers }: EngineerReportTableProps) => {
+ 
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [engineers, setEngineers] = useState<Engineer[]>(mockEngineers);
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
+  // Display mock data if no engineers exist
+  const displayEngineers = engineers.length > 0 ? engineers : mockEngineers;
 
   // يمكن التعديل لاحقًا لجلب البيانات من API أو LocalStorage
   useEffect(() => {
@@ -113,7 +120,7 @@ export const EngineerReportTable = () => {
         </TableHeader>
 
         <TableBody>
-          {engineers.map((engineer) => (
+          {displayEngineers.map((engineer) => (
             <TableRow key={engineer.id}>
               <TableCell>{engineer.name}</TableCell>
               <TableCell>{engineer.email}</TableCell>

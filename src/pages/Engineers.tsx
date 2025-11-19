@@ -1,10 +1,37 @@
-import { FileText, Clock, AlertTriangle, Users } from "lucide-react";
+import { FileText, Clock, AlertTriangle, Users, Plus } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { useTranslation } from "react-i18next";
 import { EngineerReportTable } from "@/components/EngineerTable";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import AddEngineerModal from "@/components/AddEngineerModal";
 
 const Engineers = () => {
   const { t } = useTranslation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [engineers, setEngineers] = useState<any[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("allEngineers");
+    if (saved) {
+      try {
+        setEngineers(JSON.parse(saved));
+      } catch (error) {
+        console.log("Error loading engineers:", error);
+      }
+    }
+  }, []);
+
+  const handleAddEngineer = (newEngineer: any) => {
+    const engineer = {
+      id: Date.now().toString(),
+      ...newEngineer,
+      lastActive: new Date().toISOString().split("T")[0],
+    };
+    const updatedEngineers = [...engineers, engineer];
+    setEngineers(updatedEngineers);
+    localStorage.setItem("allEngineers", JSON.stringify(updatedEngineers));
+  };
 
   return (
     <div className="space-y-6">
@@ -43,16 +70,28 @@ const Engineers = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold">
-              {t("engineers.menuEngineers")}
-            </h2>
+            <h2 className="text-xl font-semibold">Menu Engineers</h2>
             <p className="text-sm text-muted-foreground">
-              {t("engineers.manageEngineerData")}
+              manage engineer data Lorem, ipsum dolor.
             </p>
           </div>
+
+          <Button className="gap-2" onClick={() => setIsModalOpen(true)}>
+            <Plus className="h-4 w-4" />
+            {t("Add Engineer")}
+          </Button>
         </div>
-        <EngineerReportTable />
+        <EngineerReportTable
+          engineers={engineers}
+          setEngineers={setEngineers}
+        />
       </div>
+
+      <AddEngineerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAdd={handleAddEngineer}
+      />
     </div>
   );
 };

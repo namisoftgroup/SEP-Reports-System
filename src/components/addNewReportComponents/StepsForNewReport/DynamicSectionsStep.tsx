@@ -41,7 +41,7 @@ export default function DynamicStepsComponent({
   return (
     <Card className="py-8">
       <CardContent className="space-y-6">
-        <Accordion type="single" collapsible className="w-full space-y-3">
+        <Accordion type="single" collapsible className="w-full space-y-2">
           {sections.map((sectionKey) => (
             <AccordionItem
               key={sectionKey}

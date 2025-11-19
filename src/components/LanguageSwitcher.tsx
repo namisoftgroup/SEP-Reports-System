@@ -15,7 +15,7 @@ export const LanguageSwitcher = () => {
       className="w-full justify-start gap-2"
     >
       <Languages className="h-4 w-4" />
-      <span>{language === 'en' ? t('language.english') : t('language.arabic')}</span>
+      <span>{language === 'en' ? t('language.arabic'):t('language.english')}</span>
     </Button>
   );
 };

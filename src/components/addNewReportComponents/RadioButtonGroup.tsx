@@ -16,7 +16,7 @@ export function RadioButtonGroup({
           onClick={() => onChange(option.value)}
           className={`px-6 py-2 rounder font-medium text-sm transition-all ${
             value === option.value
-              ? 'bg-blue-600 rounded-sm text-white shadow-md'
+              ? 'bg-[#0d5c87] rounded-sm text-white shadow-md'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >

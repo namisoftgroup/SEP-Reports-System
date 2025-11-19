@@ -34,8 +34,9 @@ const Login = () => {
 
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-primary flex items-center justify-center">
-            <FileText className="h-8 w-8 text-primary-foreground" />
+          <div className="mx-auto w-20 h-20 rounded-full bg-secondary p-3 flex items-center justify-center">
+            {/* <FileText className="h-8 w-8 text-primary-foreground" /> */}
+            <img src="./logo.png" alt="log imgage" />
           </div>
           <div>
             <CardTitle className="text-2xl font-bold">

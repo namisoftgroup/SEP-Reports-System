@@ -67,6 +67,7 @@ const NewReport = () => {
   // Centralized form data state for all steps
   const [formData, setFormData] = useState({
     id: Date.now() + Math.floor(Math.random() * 1000),
+    state:"complete",
     step1: {
       projectName: "",
       substationName: "",

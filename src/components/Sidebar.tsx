@@ -35,10 +35,10 @@ export const Sidebar = ({ onClose }: SidebarProps) => {
       label: t("sidebar.dashboard"),
       path: "/dashboard",
     },
-    { icon: FileText, label: t("sidebar.myReports"), path: "/my-reports" },
+    { icon: FileText, label: t("sidebar.allReports"), path: "/my-reports" },
     { icon: PlusCircle, label: t("sidebar.newReport"), path: "/new-report" },
     { icon: Users, label: t("sidebar.engineers"), path: "/engineers" },
-    { icon: BarChart3, label: t("sidebar.statistics"), path: "/statistics" },
+    // { icon: BarChart3, label: t("sidebar.statistics"), path: "/statistics" },
     { icon: Settings, label: t("sidebar.settings"), path: "/settings" },
   ];
 

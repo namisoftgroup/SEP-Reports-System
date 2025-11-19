@@ -8,18 +8,18 @@ export const chartData1 = [
 
 export const chartConfig1 = {
   visitors: {
-    label: "Visitors",
+    label: "",
   },
   chrome: {
-    label: "Chrome",
+    label: "",
     color: "var(--chart-1)",
   },
   safari: {
-    label: "Safari",
+    label: "",
     color: "var(--chart-2)",
   },
   firefox: {
-    label: "Firefox",
+    label: "",
     color: "var(--chart-3)",
   },
 } satisfies ChartConfig;
@@ -31,14 +31,14 @@ export const chartData2 = [
 
 export const chartConfig2 = {
   visitors: {
-    label: "Visitors",
+    label: "",
   },
   chrome: {
-    label: "Chrome",
+    label: "",
     color: "var(--chart-1)",
   },
   safari: {
-    label: "Safari",
+    label: "",
     color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
