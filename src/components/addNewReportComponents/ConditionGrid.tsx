@@ -29,7 +29,7 @@ export default function ConditionGrid({ onGridChange }: ConditionGridProps) {
   };
 
   return (
-    <div className="py-4 sm:py-6 w-full  mx-auto">
+    <div className="py-4 sm:py-6 md:max-w-[500px] md:max-h-[500px] w-full">
       <h3 className="font-bold text-lg mb-4">
         {t("newReport.primaryGIS.assignCondition")}
       </h3>
