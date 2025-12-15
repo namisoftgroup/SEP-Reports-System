@@ -91,7 +91,8 @@
       "findings": "Findings and Recommendations",
       "step2": {
         "gisSwitchGears": "GIS Switch Gears",
-        "circuitBreakers": "Circuit Breakers",
+        "circuitBreakersHydraulic": "Circuit Breakers (Hydraulic)",
+        "circuitBreakersSpring": "Circuit Breakers (Spring)",
         "combinedDisconnectGround": "Combined Disconnect/Ground Switches",
         "groundSwitches": "Ground Switches",
         "currentTransformers": "Current Transformers",

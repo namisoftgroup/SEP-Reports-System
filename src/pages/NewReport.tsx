@@ -40,7 +40,8 @@ const NewReport = () => {
   const [stepSections, setStepSections] = useState({
     step2: [
       t("newReport.steps.step2.gisSwitchGears"),
-      t("newReport.steps.step2.circuitBreakers"),
+      t("newReport.steps.step2.circuitBreakersHydraulic"),
+      t("newReport.steps.step2.circuitBreakersSpring"),
       t("newReport.steps.step2.combinedDisconnectGround"),
       // t("newReport.steps.step2.groundSwitches"),
       t("newReport.steps.step2.currentTransformers"),
@@ -53,7 +54,10 @@ const NewReport = () => {
       t("newReport.steps.step3.capacitorBanks"),
       t("newReport.steps.step3.cableCircuits"),
     ],
-    step4: [t("newReport.steps.step4.controlSystems"), t("newReport.steps.step4.protectionRelays")],
+    step4: [
+      t("newReport.steps.step4.controlSystems"),
+      t("newReport.steps.step4.protectionRelays"),
+    ],
     step5: [
       t("newReport.steps.step5.busbarSystems"),
       t("newReport.steps.step5.gantries"),
@@ -67,7 +71,7 @@ const NewReport = () => {
   // Centralized form data state for all steps
   const [formData, setFormData] = useState({
     id: Date.now() + Math.floor(Math.random() * 1000),
-    state:"complete",
+    state: "complete",
     step1: {
       projectName: "",
       substationName: "",
@@ -120,11 +124,40 @@ const NewReport = () => {
             thermography: "",
             maintenanceDate: "",
             maintenanceType: "",
-            spareParts: "",
+            spareParts: "yes",
+            systemPipe: "yes",
+            hoseConnections: "yes",
+            drivingMechanism: "yes",
+            values: "yes",
+            oilLevel: "yes",
+            oilCondition: "yes",
+            springCondition: "yes",
+            chargingCurrent: "yes",
+            chargingTime: "yes",
+            chargingCurrentInput: "",
+            chargingTimeInput: "",
             assignCondition: "",
             riskFactor: "",
             recommendations: "",
             findingsConclusion: "",
+            // اقسام جديدة لضمان أنها موجودة
+            OperatingLevel: "no",
+            spindle: "no",
+            couplingLinkage: "no",
+            visualInspection: "no",
+            "Mechanical indication": "no",
+            "Manual operation": "no",
+            "Interlock system": "no",
+            "Terminal tightness": "no",
+            "DS contacts (outdoor)": "no",
+            "Current during opening and closing": "no",
+            "Time during opening and closing": "no",
+            "SF6 pressure/density for all compartments": "no",
+            "SF6 moisture (dew point ≤ -35 °C or as recommended)": "no",
+            "SF6 percentage (≥ 97% or as recommended)": "no",
+            "SO₂ content and decomposition (0–12 ppmv)": "no",
+            "SF6 alarms (1st and 2nd stage)": "yes",
+            "Gas leaks using a gas tester": "yes",
           };
         }
       });

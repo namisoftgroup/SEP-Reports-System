@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import FileUploader from "../FileUploader";
 import ConditionGrid from "../ConditionGrid";
 import { RadioButtonGroup } from "@/components/addNewReportComponents/RadioButtonGroup";
+import { useState } from "react";
 
 interface DynamicStepsComponentProps {
   stepKey: string;
@@ -37,11 +38,20 @@ export default function DynamicStepsComponent({
   translationPrefix,
 }: DynamicStepsComponentProps) {
   const { t } = useTranslation();
+  const [activeAccordion, setActiveAccordion] = useState(null);
 
   return (
     <Card className="py-8">
       <CardContent className="space-y-6">
-        <Accordion type="single" collapsible className="w-full space-y-2">
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full space-y-2"
+          onValueChange={(value) => {
+            setActiveAccordion(value);
+            console.log("Selected accordion:", value);
+          }}
+        >
           {sections.map((sectionKey) => (
             <AccordionItem
               key={sectionKey}
@@ -131,9 +141,7 @@ export default function DynamicStepsComponent({
                           e.target.value
                         )
                       }
-                      placeholder={t(
-                        `Enter type`
-                      )}
+                      placeholder={t(`Enter type`)}
                     />{" "}
                     <Input
                       value={
@@ -280,7 +288,7 @@ export default function DynamicStepsComponent({
 
                     <div className="space-y-2">
                       <Label htmlFor={`maintenanceType-${sectionKey}`}>
-                        {t("newReport.primaryGIS.type")}
+                        Record the hydraulic counter reading
                       </Label>
                       <Input
                         id={`maintenanceType-${sectionKey}`}
@@ -294,10 +302,12 @@ export default function DynamicStepsComponent({
                             e.target.value
                           )
                         }
+                        type="number"
                         placeholder={t("newReport.primaryGIS.typePlaceholder")}
                       />
                     </div>
 
+                    <h3 className="font-semibold text-lg">Inspect</h3>
                     <div className="space-y-2 flex justify-between items-center">
                       <Label>
                         {t("newReport.primaryGIS.sparePartsAvailability")}
@@ -305,8 +315,8 @@ export default function DynamicStepsComponent({
                       <div className="flex gap-4 mt-2">
                         <RadioButtonGroup
                           options={[
-                            { label: t("common.yes"), value: "no" },
-                            { label: t("common.no"), value: "yes" },
+                            { label: t("common.yes"), value: "yes" },
+                            { label: t("common.no"), value: "no" },
                           ]}
                           value={
                             formData[stepKey]?.[sectionKey]?.spareParts || "no"
@@ -318,6 +328,621 @@ export default function DynamicStepsComponent({
                         />
                       </div>
                     </div>
+                    {formData[stepKey]?.[sectionKey]?.spareParts === "no" && (
+                      <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                        {t("newReport.primaryGIS.sparePartsWarning")}
+                      </p>
+                    )}
+
+                    {activeAccordion === "GIS Switch Gears" && (
+                      <>
+                        {/* Record readings for */}
+                        <h3 className="font-semibold text-lg">
+                          Record readings for
+                        </h3>
+
+                        {[
+                          "SF6 pressure/density for all compartments",
+                          "SF6 moisture (dew point ≤ -35 °C or as recommended)",
+                          "SF6 percentage (≥ 97% or as recommended)",
+                          "SO₂ content and decomposition (0–12 ppmv)",
+                        ].map((item) => (
+                          <>
+                            <div
+                              key={item}
+                              className="space-y-2 flex justify-between items-center"
+                            >
+                              <Label>{item}</Label>
+                              <div className="flex gap-4 mt-2">
+                                <RadioButtonGroup
+                                  options={[
+                                    { label: t("common.yes"), value: "yes" },
+                                    { label: t("common.no"), value: "no" },
+                                  ]}
+                                  value={
+                                    formData[stepKey]?.[sectionKey]?.[item] ||
+                                    "no"
+                                  }
+                                  onChange={(value) =>
+                                    handleInputChange(sectionKey, item, value)
+                                  }
+                                  name={`${item}-${sectionKey}`}
+                                />
+                              </div>
+                            </div>
+                            {formData[stepKey]?.[sectionKey]?.[item] ===
+                              "yes" && (
+                              <div className="space-y-2">
+                                <Input
+                                  id={`chargingCurrentInput-${item}`}
+                                  value={
+                                    formData[stepKey]?.[item]
+                                      ?.chargingCurrentInput || ""
+                                  }
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      item,
+                                      "chargingCurrentInput",
+                                      e.target.value
+                                    )
+                                  }
+                                  type="number"
+                                  placeholder="enter number charging current"
+                                />
+                              </div>
+                            )}
+                          </>
+                        ))}
+                        {/* ⦁ Check for */}
+                        <h3 className="font-semibold text-lg">Check for</h3>
+
+                        {[
+                          "SF6 alarms (1st and 2nd stage)",
+                          "Gas leaks using a gas tester",
+                        ].map((item) => (
+                          <>
+                            <div
+                              key={item}
+                              className="space-y-2 flex justify-between items-center"
+                            >
+                              <Label>{item}</Label>
+                              <div className="flex gap-4 mt-2">
+                                <RadioButtonGroup
+                                  options={[
+                                    { label: t("common.yes"), value: "yes" },
+                                    { label: t("common.no"), value: "no" },
+                                  ]}
+                                  value={
+                                    formData[stepKey]?.[sectionKey]?.[item] ||
+                                    "no"
+                                  }
+                                  onChange={(value) =>
+                                    handleInputChange(sectionKey, item, value)
+                                  }
+                                  name={`${item}-${sectionKey}`}
+                                />
+                              </div>
+                            </div>
+                            {formData[stepKey]?.[sectionKey]?.[item] ===
+                              "no" && (
+                              <p className="text-sm text-red-600 mt-1 bg-yellow-100 p-4">
+                                If not OK, mentioned corrective maintenance
+                                required
+                              </p>
+                            )}
+                          </>
+                        ))}
+                      </>
+                    )}
+
+                    {activeAccordion === "Circuit Breakers (Hydraulic)" && (
+                      <>
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Hydraulic system pipes</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]?.systemPipe ||
+                                "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "systemPipe",
+                                  value
+                                )
+                              }
+                              name={`systemPipe-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.systemPipe ===
+                          "no" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Hose connections</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]
+                                  ?.hoseConnections || "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "hoseConnections",
+                                  value
+                                )
+                              }
+                              name={`hoseConnections-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.hoseConnections ===
+                          "no" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Driving mechanism</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]
+                                  ?.drivingMechanism || "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "drivingMechanism",
+                                  value
+                                )
+                              }
+                              name={`drivingMechanism-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.drivingMechanism ===
+                          "no" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label> Valves</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]?.values || "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(sectionKey, "values", value)
+                              }
+                              name={`values-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.values === "no" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+
+                        <h3 className="font-semibold text-lg">Check</h3>
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Oil level</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]?.oilLevel ||
+                                "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(sectionKey, "oilLevel", value)
+                              }
+                              name={`oilLevel-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.oilLevel === "no" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Oil Condition</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]?.oilCondition ||
+                                "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "oilCondition",
+                                  value
+                                )
+                              }
+                              name={`oilCondition-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.oilCondition ===
+                          "no" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+                      </>
+                    )}
+                    {activeAccordion === "Circuit Breakers (Spring)" && (
+                      <>
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Motor and spring condition</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]
+                                  ?.springCondition || "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "springCondition",
+                                  value
+                                )
+                              }
+                              name={`springCondition-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.springCondition ===
+                          "no" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Motor charging current</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]
+                                  ?.chargingCurrent || "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "chargingCurrent",
+                                  value
+                                )
+                              }
+                              name={`chargingCurrent-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.chargingCurrent ===
+                          "yes" && (
+                          <div className="space-y-2">
+                            <Input
+                              id={`chargingCurrentInput-${sectionKey}`}
+                              value={
+                                formData[stepKey]?.[sectionKey]
+                                  ?.chargingCurrentInput || ""
+                              }
+                              onChange={(e) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "chargingCurrentInput",
+                                  e.target.value
+                                )
+                              }
+                              type="number"
+                              placeholder="enter number charging current"
+                            />
+                          </div>
+                        )}
+
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Motor charging time</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]?.chargingTime ||
+                                "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "chargingTime",
+                                  value
+                                )
+                              }
+                              name={`chargingTime-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.chargingTime ===
+                          "yes" && (
+                          <div className="space-y-2">
+                            <Input
+                              id={`chargingTimeInput-${sectionKey}`}
+                              value={
+                                formData[stepKey]?.[sectionKey]
+                                  ?.chargingTimeInput || ""
+                              }
+                              onChange={(e) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "chargingTimeInput",
+                                  e.target.value
+                                )
+                              }
+                              type="number"
+                              placeholder="enter number charging time"
+                            />
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {activeAccordion ===
+                      "Combined Disconnect/Ground Switches" && (
+                      <>
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Perform a visual inspection </Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]
+                                  ?.visualInspection || "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "visualInspection",
+                                  value
+                                )
+                              }
+                              name={`visualInspection-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.visualInspection ===
+                          "yes" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+
+                        <h3 className="font-semibold text-lg">
+                          Inspect and lubricate
+                        </h3>
+
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Operating level</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]
+                                  ?.OperatingLevel || "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "OperatingLevel",
+                                  value
+                                )
+                              }
+                              name={`OperatingLevel-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.OperatingLevel ===
+                          "yes" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Cogwheel and spindle</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]?.spindle || "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(sectionKey, "spindle", value)
+                              }
+                              name={`spindle-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.spindle === "yes" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+                        <div className="space-y-2 flex justify-between items-center">
+                          <Label>Coupling linkage</Label>
+                          <div className="flex gap-4 mt-2">
+                            <RadioButtonGroup
+                              options={[
+                                { label: t("common.yes"), value: "yes" },
+                                { label: t("common.no"), value: "no" },
+                              ]}
+                              value={
+                                formData[stepKey]?.[sectionKey]
+                                  ?.couplingLinkage || "no"
+                              }
+                              onChange={(value) =>
+                                handleInputChange(
+                                  sectionKey,
+                                  "couplingLinkage",
+                                  value
+                                )
+                              }
+                              name={`couplingLinkage-${sectionKey}`}
+                            />
+                          </div>
+                        </div>
+                        {formData[stepKey]?.[sectionKey]?.couplingLinkage ===
+                          "yes" && (
+                          <p className="text-sm text-red-600 mt-1 space-y-2 flex justify-between items-center bg-yellow-100 p-4">
+                            If not OK, mentioned corrective maintenance required
+                          </p>
+                        )}
+                        {/* ⦁ Check */}
+
+                        <h3 className="font-semibold text-lg">Check</h3>
+
+                        {[
+                          "Mechanical indication",
+                          "Manual operation",
+                          "Interlock system",
+                          "Terminal tightness",
+                          "DS contacts (outdoor)",
+                        ].map((item) => (
+                          <>
+                            <div
+                              key={item}
+                              className="space-y-2 flex justify-between items-center"
+                            >
+                              <Label>{item}</Label>
+                              <div className="flex gap-4 mt-2">
+                                <RadioButtonGroup
+                                  options={[
+                                    { label: t("common.yes"), value: "yes" },
+                                    { label: t("common.no"), value: "no" },
+                                  ]}
+                                  value={
+                                    formData[stepKey]?.[sectionKey]?.[item] ||
+                                    "no"
+                                  }
+                                  onChange={(value) =>
+                                    handleInputChange(sectionKey, item, value)
+                                  }
+                                  name={`${item}-${sectionKey}`}
+                                />
+                              </div>
+                            </div>
+                            {formData[stepKey]?.[sectionKey]?.[item] ===
+                              "yes" && (
+                              <p className="text-sm text-red-600 mt-1 bg-yellow-100 p-4">
+                                If not OK, mentioned corrective maintenance
+                                required
+                              </p>
+                            )}
+                          </>
+                        ))}
+                        <h3 className="font-semibold text-lg">
+                          Test motor running
+                        </h3>
+                        {[
+                          "Current during opening and closing",
+                          "Time during opening and closing",
+                        ].map((item) => (
+                          <>
+                            <div
+                              key={item}
+                              className="space-y-2 flex justify-between items-center"
+                            >
+                              <Label>{item}</Label>
+                              <div className="flex gap-4 mt-2">
+                                <RadioButtonGroup
+                                  options={[
+                                    { label: t("common.yes"), value: "yes" },
+                                    { label: t("common.no"), value: "no" },
+                                  ]}
+                                  value={
+                                    formData[stepKey]?.[sectionKey]?.[item] ||
+                                    "no"
+                                  }
+                                  onChange={(value) =>
+                                    handleInputChange(sectionKey, item, value)
+                                  }
+                                  name={`${item}-${sectionKey}`}
+                                />
+                              </div>
+                            </div>
+                            {formData[stepKey]?.[sectionKey]?.[item] ===
+                              "yes" && (
+                              <div className="space-y-2">
+                                <Input
+                                  id={`chargingCurrentInput-${item}`}
+                                  value={
+                                    formData[stepKey]?.[item]
+                                      ?.chargingCurrentInput || ""
+                                  }
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      item,
+                                      "chargingCurrentInput",
+                                      e.target.value
+                                    )
+                                  }
+                                  type="number"
+                                  placeholder="enter number charging current"
+                                />
+                              </div>
+                            )}
+                          </>
+                        ))}
+                      </>
+                    )}
                   </div>
                 </div>
 
